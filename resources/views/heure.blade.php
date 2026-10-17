@@ -1,16 +1,6 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Heure - Mini-CMS</title>
-</head>
-<body>
-    <h1>Heure actuelle</h1>
-    <p>{{ $heure }} - {{ $date }}</p>
-    <p>
-        <a href="{{ route('home') }}">Accueil</a> |
-        <a href="{{ route('about') }}">À propos</a>
-    </p>
-</body>
-</html>
+<x-layout>
+    <x-slot:title>Heure du serveur - Mini-CMS</x-slot:title>
+
+    <h1 class="text-3xl font-bold">Heure du serveur</h1>
+    <p class="mt-4 text-gray-700">Il est {{ $heure }} le {{ $date }}.</p>
+</x-layout>

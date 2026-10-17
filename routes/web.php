@@ -20,9 +20,4 @@ Route::prefix('posts')->name('posts.')->group(function () {
         ->name('show');
 });
 
-Route::get('/heure', function () {
-    return view('heure', [
-        'heure' => now()->format('H:i'),
-        'date' => now()->format('d/m/Y'),
-    ]);
-});
+Route::get('/heure', [PageController::class, 'time'])->name('time');
