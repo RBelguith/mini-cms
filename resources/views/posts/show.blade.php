@@ -23,6 +23,14 @@
         <div class="mt-8 flex flex-wrap items-start gap-4">
             <a href="{{ route('posts.edit', $post) }}" class="rounded-md border border-indigo-600 px-4 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50">Modifier</a>
 
+            <form method="POST" action="{{ route('posts.publication', $post) }}">
+                @csrf
+                @method('PATCH')
+                <button type="submit" class="rounded-md border border-gray-600 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100">
+                    {{ $post->is_published ? 'Dépublier' : 'Publier' }}
+                </button>
+            </form>
+
             <details>
                 <summary class="cursor-pointer rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50">Supprimer</summary>
 

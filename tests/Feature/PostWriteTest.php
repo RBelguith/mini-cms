@@ -77,3 +77,27 @@ it('deletes a post', function () {
 
     $this->assertDatabaseMissing('posts', ['id' => $post->id]);
 });
+
+it('publishes a draft from the home of the article page', function () {
+    $post = Post::create(postData(['is_published' => '0']));
+
+    $this->patch(route('posts.publication', $post))
+        ->assertRedirect(route('posts.show', $post));
+
+    $this->assertDatabaseHas('posts', [
+        'id' => $post->id,
+        'is_published' => true,
+    ]);
+});
+
+it('unpublishes a post', function () {
+    $post = Post::create(postData(['is_published' => '1']));
+
+    $this->patch(route('posts.publication', $post))
+        ->assertRedirect(route('posts.show', $post));
+
+    $this->assertDatabaseHas('posts', [
+        'id' => $post->id,
+        'is_published' => false,
+    ]);
+});
