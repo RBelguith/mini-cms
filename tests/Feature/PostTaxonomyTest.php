@@ -88,3 +88,35 @@ it('counts the published posts of each category on the home page', function () {
         ->assertOk()
         ->assertSee('Tutoriels (2)');
 });
+
+it('lists the published posts of a tag by its slug', function () {
+    $tag = Tag::factory()->create(['name' => 'Astuce', 'slug' => 'astuce']);
+    Post::factory()->published()->create(['title' => 'Dans le tag'])->tags()->attach($tag);
+    Post::factory()->published()->create(['title' => 'Hors du tag']);
+    Post::factory()->create(['title' => 'Brouillon du tag'])->tags()->attach($tag);
+
+    $this->get('/posts/tag/astuce')
+        ->assertOk()
+        ->assertSee('Dans le tag')
+        ->assertDontSee('Brouillon du tag')
+        ->assertDontSee('Hors du tag');
+});
+
+it('returns 404 for an unknown tag slug', function () {
+    $this->get('/posts/tag/inconnu')->assertNotFound();
+});
+
+it('counts the published posts of each tag on the home page', function () {
+    $draftTag = Tag::factory()->create(['name' => 'SeulementBrouillons']);
+    Post::factory()->create(['title' => 'Brouillon orphelin'])->tags()->attach($draftTag);
+
+    $popular = Tag::factory()->create(['name' => 'Populaire']);
+    Post::factory(2)->published()->create(['title' => 'Article du tag populaire'])->each(
+        fn (Post $post) => $post->tags()->attach($popular)
+    );
+
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertDontSee('SeulementBrouillons')
+        ->assertSee('Populaire (2)');
+});
