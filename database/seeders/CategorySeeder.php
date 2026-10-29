@@ -13,10 +13,10 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         Category::factory()->createMany([
-            ['name' => 'Laravel', 'slug' => 'laravel'],
             ['name' => 'PHP', 'slug' => 'php'],
-            ['name' => 'Bases de données', 'slug' => 'bases-de-donnees'],
-            ['name' => 'Front-end', 'slug' => 'front-end'],
+            ['name' => 'Laravel', 'slug' => 'laravel'],
+            ['name' => 'JavaScript', 'slug' => 'javascript'],
+            ['name' => 'Base de données', 'slug' => 'base-de-donnees'],
         ]);
     }
 }

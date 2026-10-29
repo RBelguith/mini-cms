@@ -14,11 +14,11 @@ class TagSeeder extends Seeder
     {
         Tag::factory()->createMany([
             ['name' => 'Débutant', 'slug' => 'debutant'],
-            ['name' => 'Astuce', 'slug' => 'astuce'],
-            ['name' => 'Sécurité', 'slug' => 'securite'],
-            ['name' => 'Performance', 'slug' => 'performance'],
             ['name' => 'Tests', 'slug' => 'tests'],
             ['name' => 'Blade', 'slug' => 'blade'],
+            ['name' => 'Eloquent', 'slug' => 'eloquent'],
+            ['name' => 'API', 'slug' => 'api'],
+            ['name' => 'Sécurité', 'slug' => 'securite'],
         ]);
     }
 }

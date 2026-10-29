@@ -11,6 +11,21 @@ use Illuminate\Support\Str;
  */
 class CategoryFactory extends Factory
 {
+    /** Catégories réelles du thème développement web. */
+    private const NAMES = [
+        'PHP',
+        'Laravel',
+        'JavaScript',
+        'Base de données',
+        'Front-end',
+        'Back-end',
+        'Sécurité',
+        'Performance',
+    ];
+
+    /** Index cyclique : des noms distincts sans jamais épuiser la liste. */
+    private static int $index = 0;
+
     /**
      * Define the model's default state.
      *
@@ -18,10 +33,10 @@ class CategoryFactory extends Factory
      */
     public function definition(): array
     {
-        $name = fake()->unique()->words(2, true);
+        $name = self::NAMES[self::$index++ % count(self::NAMES)];
 
         return [
-            'name' => Str::ucfirst($name),
+            'name' => $name,
             'slug' => Str::slug($name),
         ];
     }

@@ -11,6 +11,19 @@ use Illuminate\Support\Str;
  */
 class TagFactory extends Factory
 {
+    /** Tags réels du thème développement web. */
+    private const NAMES = [
+        'Débutant',
+        'Tests',
+        'Blade',
+        'Eloquent',
+        'API',
+        'Sécurité',
+    ];
+
+    /** Index cyclique : des noms distincts sans jamais épuiser la liste. */
+    private static int $index = 0;
+
     /**
      * Define the model's default state.
      *
@@ -18,7 +31,7 @@ class TagFactory extends Factory
      */
     public function definition(): array
     {
-        $name = fake()->unique()->word();
+        $name = self::NAMES[self::$index++ % count(self::NAMES)];
 
         return [
             'name' => $name,
