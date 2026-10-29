@@ -52,5 +52,17 @@
                 </form>
             </details>
         </div>
+
+        @if ($related->isNotEmpty())
+            <section class="mt-10 border-t border-gray-200 pt-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Dans la même catégorie</h2>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                    @foreach ($related as $relatedPost)
+                        <x-post-card :post="$relatedPost" />
+                    @endforeach
+                </div>
+            </section>
+        @endif
     </article>
 </x-layout>

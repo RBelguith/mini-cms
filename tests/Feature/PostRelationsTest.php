@@ -60,3 +60,26 @@ it('removes the pivot rows when a post is deleted', function () {
     $this->assertDatabaseMissing('post_tag', ['post_id' => $post->id]);
     $this->assertDatabaseHas('tags', ['id' => $tag->id]);
 });
+
+it('shows up to three other published posts of the same category', function () {
+    $category = Category::factory()->create(['name' => 'Tutoriels']);
+    $post = Post::factory()->published()->create(['category_id' => $category->id]);
+    $relatedPost = Post::factory()->published()->create(['category_id' => $category->id, 'title' => 'Article frere publie']);
+    Post::factory()->create(['category_id' => $category->id, 'title' => 'Article frere brouillon']);
+    Post::factory()->published()->create(['title' => 'Article autre categorie']);
+
+    $this->get(route('posts.show', $post))
+        ->assertOk()
+        ->assertSee('Dans la même catégorie')
+        ->assertSee('Article frere publie')
+        ->assertDontSee('Article frere brouillon', false)
+        ->assertDontSee('Article autre categorie', false);
+});
+
+it('hides the related section when the post has no category', function () {
+    $post = Post::factory()->published()->create();
+
+    $this->get(route('posts.show', $post))
+        ->assertOk()
+        ->assertDontSee('Dans la même catégorie');
+});
