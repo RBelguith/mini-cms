@@ -53,16 +53,12 @@ In order to ensure that the Laravel community is welcoming to all, please review
 
 If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-## État actuel (tag lab-04)
+## État actuel (tag lab-04b)
 
-- Modèles `Category` et `Tag` reliés à `Post` : un article a une catégorie et un auteur (1:N) et plusieurs tags (N:N, table pivot `post_tag`).
-- Fabriques `PostFactory` (état `published()`), `CategoryFactory`, `TagFactory` et seeders pour un jeu de données réaliste.
-- Chargement anticipé avec `with()` ; `Model::preventLazyLoading()` signale tout problème N+1 hors production.
-- Tests Pest : `PostPagesTest`, `PostWriteTest` et `PostRelationsTest`.
-
-## Données de démonstration
-
-Après un clone, reconstruire la base avec `php artisan migrate:fresh --seed`. Attention : cette commande vide la base avant de la remplir.
+- Formulaires d'article : catégorie (liste déroulante) et tags (cases à cocher, synchronisés avec `sync()`).
+- Pages publiques par catégorie et par tag, liées par slug (`{category:slug}`, `{tag:slug}`).
+- Accueil : catégories et tags populaires comptés avec `withCount`, articles publiés seulement.
+- Tests Pest : `PostPagesTest`, `PostWriteTest`, `PostRelationsTest` et `PostTaxonomyTest`.
 
 ## Routes disponibles
 
@@ -73,6 +69,8 @@ Après un clone, reconstruire la base avec `php artisan migrate:fresh --seed`. A
 | GET | `/heure` | `time` | `PageController@time` |
 | GET | `/posts` | `posts.index` | `PostController@index` |
 | GET | `/posts/archive/{year}` | `posts.archive` | `PostController@archive` |
+| GET | `/posts/categorie/{category:slug}` | `posts.category` | `PostController@byCategory` |
+| GET | `/posts/tag/{tag:slug}` | `posts.tag` | `PostController@byTag` |
 | GET | `/posts/create` | `posts.create` | `PostController@create` |
 | POST | `/posts` | `posts.store` | `PostController@store` |
 | GET | `/posts/{post}` | `posts.show` | `PostController@show` |
@@ -80,6 +78,10 @@ Après un clone, reconstruire la base avec `php artisan migrate:fresh --seed`. A
 | PUT | `/posts/{post}` | `posts.update` | `PostController@update` |
 | DELETE | `/posts/{post}` | `posts.destroy` | `PostController@destroy` |
 | PATCH | `/posts/{post}/publication` | `posts.publication` | `PostController@togglePublication` |
+
+## Données de démonstration
+
+Après un clone, reconstruire la base avec `php artisan migrate:fresh --seed`. Attention : cette commande vide la base avant de la remplir.
 
 ## Captures d'écran
 
@@ -112,6 +114,12 @@ Après un clone, reconstruire la base avec `php artisan migrate:fresh --seed`. A
 ![Liste des articles avec leur catégorie, leur auteur et leurs tags](screenshots/s07-liste-relations.png)
 
 ![Page d'un article avec ses tags et les articles de la même catégorie](screenshots/s07-detail-tags.png)
+
+### Session 08
+
+![Formulaire de modification avec la catégorie et les tags](screenshots/s08-formulaire-relations.png)
+
+![Page des articles d'une catégorie](screenshots/s08-page-categorie.png)
 
 ## License
 
