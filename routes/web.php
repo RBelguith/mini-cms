@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
@@ -21,4 +22,8 @@ Route::get('/posts/tag/{tag:slug}', [PostController::class, 'byTag'])
 Route::middleware('writable')->group(function () {
     Route::resource('posts', PostController::class);
     Route::patch('/posts/{post}/publication', [PostController::class, 'togglePublication'])->name('posts.publication');
+
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::resource('categories', CategoryController::class)->except('show');
+    });
 });
