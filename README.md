@@ -7,111 +7,124 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
+# Mini-CMS
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Description
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Mini-CMS est un petit site de gestion d'articles réalisé au fil des sessions 01 à 15 du codelab Laravel. Il combine une interface web en Blade et une API JSON protégée par des jetons Sanctum. Les articles appartiennent à des auteurs, sont classés par catégories et portent des tags ; un administrateur gère les catégories, les tags et les rôles.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Le dépôt est livré avec le tag `lab-08b`. Les étapes intermédiaires sont conservées par les tags `lab-07`, `lab-07b` et `lab-08`.
 
-## Learning Laravel
+## Fonctionnalités
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- Pages publiques : accueil, à propos, heure courante, liste des articles, archive annuelle, pages par catégorie et par tag.
+- Articles : création, modification, suppression, publication/dépublication, brouillons visibles seulement par leur auteur et les administrateurs.
+- Catégories et tags associés aux articles, avec formulaires d'administration.
+- Authentification manuelle (inscription, connexion, déconnexion), rôles `admin` / `author`, Gates et `PostPolicy`.
+- API JSON en lecture pour les articles, catégories et tags ; API en écriture protégée par Sanctum.
+- Filtres `?category=<slug>` et `?tag=<slug>`, pagination `?per_page=` de 1 à 50.
+- Validation et messages d'erreur en français, pages 404/503 dans le layout.
+- Suite de tests Pest complète : 107 tests au tag `lab-08b`.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Installation
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+Le projet utilise SQLite : aucune configuration de base de données n'est à faire.
 
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### Bash
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install
+npm install
+npm run build
+cp .env.example .env
+php artisan key:generate
+php artisan migrate:fresh --seed
+php artisan test
+composer run dev
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### PowerShell
 
-## Contributing
+```powershell
+composer install
+npm install
+npm run build
+copy .env.example .env
+php artisan key:generate
+php artisan migrate:fresh --seed
+php artisan test
+composer run dev
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Si Artisan propose de créer `database/database.sqlite`, répondez `yes`. Le serveur de développement écoute ensuite sur `http://localhost:8000` (ou `http://127.0.0.1:8000`).
 
-## Code of Conduct
+## Comptes de test
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Le seeder crée ces comptes, tous avec le mot de passe `password` :
 
-## Security Vulnerabilities
+| Nom | E-mail | Rôle |
+|---|---|---|
+| Claire Fontaine | `test@example.com` | `admin` |
+| Deux auteurs générés par la fabrique | visibles dans `/admin/utilisateurs` après connexion | `author` |
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Un compte auteur peut modifier ses propres articles ; il reçoit un 403 sur ceux d'un autre auteur. Le compte admin peut tout gérer.
 
-## État actuel (tag lab-08)
+## API
 
-- `GET /api/categories` et `GET /api/categories/{category}`, avec le nombre d'articles publiés de chaque catégorie.
-- `GET /api/posts?category=<slug>&tag=<slug>` : filtres par catégorie et par tag, comparaison exacte, slug inconnu refusé (422).
-- `POST /api/login` renvoie un jeton Sanctum ; `POST /api/logout` le révoque.
-- `POST`, `PUT/PATCH` et `DELETE /api/posts` protégés par `auth:sanctum`, avec les mêmes Form Requests et la même `PostPolicy` que le site (401, 403 et 422 en JSON).
-- Tests Pest `ApiReadTest` et `ApiWriteTest`.
+Les réponses sont toujours JSON. Toutes les requêtes doivent envoyer l'en-tête `Accept: application/json`.
 
-## Routes disponibles
+### Endpoints
 
-| Méthode | URI | Nom | Action |
+| Méthode | URI | Nom | Description |
 |---|---|---|---|
-| GET | `/` | `home` | `PageController@home` |
-| GET | `/a-propos` | `about` | `PageController@about` |
-| GET | `/heure` | `time` | `PageController@time` |
-| GET | `/posts` | `posts.index` | `PostController@index` |
-| GET | `/posts/archive/{year}` | `posts.archive` | `PostController@archive` |
-| GET | `/posts/categorie/{category:slug}` | `posts.category` | `PostController@byCategory` |
-| GET | `/posts/tag/{tag:slug}` | `posts.tag` | `PostController@byTag` |
-| GET | `/posts/create` | `posts.create` | `PostController@create` |
-| POST | `/posts` | `posts.store` | `PostController@store` |
-| GET | `/posts/{post}` | `posts.show` | `PostController@show` |
-| GET | `/posts/{post}/edit` | `posts.edit` | `PostController@edit` |
-| PUT | `/posts/{post}` | `posts.update` | `PostController@update` |
-| DELETE | `/posts/{post}` | `posts.destroy` | `PostController@destroy` |
-| PATCH | `/posts/{post}/publication` | `posts.publication` | `PostController@togglePublication` |
-| GET | `/admin/categories` | `admin.categories.index` | `CategoryController@index` |
-| GET | `/admin/categories/create` | `admin.categories.create` | `CategoryController@create` |
-| POST | `/admin/categories` | `admin.categories.store` | `CategoryController@store` |
-| GET | `/admin/categories/{category}/edit` | `admin.categories.edit` | `CategoryController@edit` |
-| PUT | `/admin/categories/{category}` | `admin.categories.update` | `CategoryController@update` |
-| DELETE | `/admin/categories/{category}` | `admin.categories.destroy` | `CategoryController@destroy` |
-| GET | `/admin/tags` | `admin.tags.index` | `TagController@index` |
-| GET | `/admin/tags/create` | `admin.tags.create` | `TagController@create` |
-| POST | `/admin/tags` | `admin.tags.store` | `TagController@store` |
-| GET | `/admin/tags/{tag}/edit` | `admin.tags.edit` | `TagController@edit` |
-| PUT | `/admin/tags/{tag}` | `admin.tags.update` | `TagController@update` |
-| DELETE | `/admin/tags/{tag}` | `admin.tags.destroy` | `TagController@destroy` |
-| GET | `/admin/utilisateurs` | `admin.users.index` | `UserController@index` |
-| PATCH | `/admin/utilisateurs/{user}/role` | `admin.users.role` | `UserController@role` |
-| GET | `/inscription` | `register` | `Auth\RegisterController@create` |
-| POST | `/inscription` | `register.store` | `Auth\RegisterController@store` |
-| GET | `/connexion` | `login` | `Auth\LoginController@create` |
-| POST | `/connexion` | `login.store` | `Auth\LoginController@store` |
-| POST | `/deconnexion` | `logout` | `Auth\LoginController@destroy` |
-| GET | `/mes-articles` | `my-posts` | `PostController@myPosts` |
-| GET | `/api/posts` | `api.posts.index` | `Api\PostController@index` |
-| GET | `/api/posts/{post}` | `api.posts.show` | `Api\PostController@show` |
-| GET | `/api/categories` | `api.categories.index` | `Api\CategoryController@index` |
-| GET | `/api/categories/{category}` | `api.categories.show` | `Api\CategoryController@show` |
-| POST | `/api/login` | `api.login` | `Api\AuthController@login` |
-| POST | `/api/logout` | `api.logout` | `Api\AuthController@logout` |
-| POST | `/api/posts` | `api.posts.store` | `Api\PostController@store` |
-| PUT/PATCH | `/api/posts/{post}` | `api.posts.update` | `Api\PostController@update` |
-| DELETE | `/api/posts/{post}` | `api.posts.destroy` | `Api\PostController@destroy` |
+| GET | `/api/posts` | `api.posts.index` | Articles publiés, paginés et filtrables |
+| GET | `/api/posts/{post}` | `api.posts.show` | Un article visible |
+| POST | `/api/login` | `api.login` | Obtient un jeton Sanctum |
+| POST | `/api/logout` | `api.logout` | Révoque le jeton courant |
+| GET | `/api/user` | — | Utilisateur associé au jeton |
+| GET | `/api/categories` | `api.categories.index` | Catégories avec `posts_count` |
+| GET | `/api/categories/{category}` | `api.categories.show` | Une catégorie avec `posts_count` |
+| GET | `/api/tags` | `api.tags.index` | Tags avec `posts_count` |
+| GET | `/api/tags/{tag}` | `api.tags.show` | Un tag avec `posts_count` |
+| POST | `/api/posts` | `api.posts.store` | Crée un article |
+| PUT/PATCH | `/api/posts/{post}` | `api.posts.update` | Modifie un article |
+| DELETE | `/api/posts/{post}` | `api.posts.destroy` | Supprime un article |
 
-## Données de démonstration
+Exemple de lecture filtrée : `GET /api/posts?category=php&tag=api&per_page=2`.
 
-Après un clone, reconstruire la base avec `php artisan migrate:fresh --seed`. Attention : cette commande vide la base avant de la remplir.
+### Authentification par jeton
+
+`POST /api/login` accepte `email` et `password` et renvoie :
+
+```json
+{
+  "token": "...",
+  "token_type": "Bearer"
+}
+```
+
+Envoyez ensuite `Authorization: Bearer <jeton>` sur les écritures et sur `/api/user` ou `/api/logout`. `POST /api/logout` supprime uniquement le jeton utilisé pour la requête ; les autres appareils restent connectés.
+
+Une collection Postman exportable se trouve dans `docs/postman/mini-cms.postman_collection.json` : la requête « Connexion » mémorise le jeton dans une variable de collection, et l'export ne contient aucun jeton.
+
+### Codes d'erreur
+
+| Code | Situation |
+|---|---|
+| 401 | Jeton absent, invalide ou révoqué sur une route protégée |
+| 403 | L'utilisateur n'a pas le droit de voir ou modifier la ressource |
+| 404 | Article, catégorie ou tag introuvable |
+| 422 | Validation échouée, y compris un slug de filtre inconnu |
+
+Les messages de validation sont traduits en français, par exemple « La valeur sélectionnée pour le champ catégorie est invalide. »
+
+### Exemple curl.exe
+
+```powershell
+curl.exe -X POST -H "Accept: application/json" -H "Authorization: Bearer VOTRE_JETON" http://localhost:8000/api/logout
+```
+
+Remplacez `VOTRE_JETON` par le jeton renvoyé par la requête de connexion. La réponse 204 n'a pas de corps.
 
 ## Captures d'écran
 
@@ -183,7 +196,7 @@ Sprint : middleware `admin` sur tout `/admin`, Gate `manage-tags`, `PostPolicy::
 
 ### Session 13
 
-Réponses de l'API appelées avec l'en-tête `Accept: application/json` (capturées dans le navigateur, Postman n'étant pas installé sur ce poste).
+Réponses de l'API appelées avec l'en-tête `Accept: application/json`.
 
 ![Réponse JSON de GET /api/posts?per_page=2, avec data, links et meta](screenshots/s13-postman-liste.png)
 
@@ -191,9 +204,69 @@ Réponses de l'API appelées avec l'en-tête `Accept: application/json` (captur�
 
 ### Session 14
 
-![Postman : POST /api/posts avec un jeton Bearer, onglet Body, réponse 201 Created](screenshots/s14-postman-201.png)
+![Création d'un article avec un jeton Bearer, onglet Body, réponse 201 Created](screenshots/s14-postman-201.png)
 
-![Postman : PUT sur l'article d'un autre auteur, réponse 403](screenshots/s14-postman-403.png)
+![PUT sur l'article d'un autre auteur, réponse 403](screenshots/s14-postman-403.png)
+
+## Choix d'architecture
+
+### Pourquoi les écritures de l'API passent par PostPolicy
+
+Le site et l'API utilisent les mêmes Form Requests et la même `PostPolicy`. Ainsi, une seule règle décide qui peut créer, modifier ou supprimer un article : si elle change, les deux portes changent ensemble. L'API ne peut donc pas devenir un raccourci qui contourne les droits définis pour l'interface web, et les deux côtés renvoient les mêmes 401, 403 et 422.
+
+### Pourquoi preventLazyLoading est activé
+
+Sans chargement anticipé, lire une relation dans une boucle déclenche une requête SQL par élément : c'est le problème N+1. En développement, `preventLazyLoading()` transforme ce défaut silencieux en erreur explicite, ce qui oblige à écrire `with()` ou `load()` dès qu'une relation est utilisée. La protection reste désactivée en production pour ne pas casser le site si une relation oubliée apparaissait.
+
+### Pourquoi l'API utilise des jetons et non la session
+
+Le groupe `api` n'a ni session ni cookie : un client qui n'est pas un navigateur (script, application mobile, Postman) n'a pas de cookies à présenter. Avec Sanctum, chaque requête porte un jeton Bearer que l'on peut révoquer individuellement avec `/api/logout`, sans déconnecter les autres appareils. Cela garde aussi l'API sans état côté serveur.
+
+## About Laravel
+
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+
+- [Simple, fast routing engine](https://laravel.com/docs/routing).
+- [Powerful dependency injection container](https://laravel.com/docs/container).
+- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+- [Robust background job processing](https://laravel.com/docs/queues).
+- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
+
+## Learning Laravel
+
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+
+In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+
+You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+
+## Agentic Development
+
+Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+
+```bash
+composer require laravel/boost --dev
+
+php artisan boost:install
+```
+
+Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+
+## Contributing
+
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+
+## Code of Conduct
+
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+
+## Security Vulnerabilities
+
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
 ## License
 
