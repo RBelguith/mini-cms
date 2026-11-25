@@ -15,6 +15,10 @@
             <x-nav-link to="admin.tags.index" match="admin.tags.*">Tags</x-nav-link>
         @endcan
 
+        @if (auth()->user()?->isAdmin())
+            <x-nav-link to="admin.users.index" match="admin.users.*">Utilisateurs</x-nav-link>
+        @endif
+
         <div class="ml-auto flex flex-wrap items-center gap-2">
             @auth
                 <x-nav-link to="my-posts">Mes articles</x-nav-link>
