@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
@@ -59,6 +60,17 @@ class PostController extends Controller
         return view('posts.create', [
             'categories' => Category::orderBy('name')->get(),
             'tags' => Tag::orderBy('name')->get(),
+        ]);
+    }
+
+    public function myPosts(Request $request): View
+    {
+        return view('posts.index', [
+            'heading' => 'Mes articles',
+            'posts' => $request->user()->posts()
+                ->with('user', 'category', 'tags')
+                ->latest('id')
+                ->paginate(4),
         ]);
     }
 
