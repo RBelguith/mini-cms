@@ -167,3 +167,20 @@ Authentification manuelle, Gates et policies : la barre de navigation d'un utili
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Comparaison avec le starter kit Livewire
+
+| Critère | Mini-CMS (authentification manuelle) | Starter kit Livewire |
+|---|---|---|
+| Routes d'authentification | `routes/web.php` : `/inscription`, `/connexion`, `/deconnexion` | enregistrées par Fortify depuis son paquet ; absentes de `routes/web.php` |
+| Inscription | `app/Http/Controllers/Auth/RegisterController.php` + `app/Http/Requests/RegisterRequest.php` | `app/Actions/Fortify/CreateNewUser.php` (`Validator::make` puis `User::create`) |
+| Connexion | `app/Http/Controllers/Auth/LoginController.php::store` (`Auth::attempt`, `regenerate`) | contrôleur de Fortify + `resources/views/pages/auth/login.blade.php` |
+| Déconnexion | `LoginController::destroy` (`logout`, `invalidate`, `regenerateToken`) | route `logout` de Fortify ; mêmes opérations dans `app/Livewire/Actions/Logout.php` |
+| Limitation des tentatives | aucune | 5 tentatives par minute par e-mail et adresse IP (`app/Providers/FortifyServiceProvider.php`) |
+| Mot de passe oublié | absent | `Features::resetPasswords()` dans `config/fortify.php` |
+| Vérification de l'e-mail | absente | `Features::emailVerification()`, `MustVerifyEmail`, middleware `verified` |
+| Double authentification | absente | `Features::twoFactorAuthentication()` et `Features::passkeys()` |
+| Rôles et autorisations | colonne `role` (`app/Models/User.php`), Gates (`app/Providers/AppServiceProvider.php`), `app/Policies/PostPolicy.php`, middleware `app/Http/Middleware/EnsureUserIsAdmin.php` | aucun : à écrire soi-même |
+| Tests | `tests/Feature/AuthTest.php`, `AuthorizationTest.php`, `AdminAccessTest.php`, `PostVisibilityTest.php` | 10 fichiers dans `tests/Feature` (écrits avec PHPUnit dans le dépôt) |
+
+Ce que je garderais du kit dans un vrai projet : la limitation des tentatives, la réinitialisation du mot de passe et la vérification de l'e-mail, déjà écrites et testées par Fortify ; je garderais mon code d'autorisation (rôle, Gates, Policy, middleware), car aucun starter kit ne connaît les règles de mon domaine.
